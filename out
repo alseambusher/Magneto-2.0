@@ -1,0 +1,15 @@
+
+put("close window","1");
+put("minimise","2");
+put("minimize","2");
+put("maximize","3");
+put("minimise","3");
+put("next","4");
+put("fill","5");
+put("back","6");
+put("select all","7");
+put("undo","8");
+put("copy","9");
+put("cut","10");
+put("right click","11");
+put("left click","12");
