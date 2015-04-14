@@ -40,6 +40,9 @@ public class Commands {
         put("take video", "18");
         put("pause video", "19");
         put("unpause video", "20");
+        put("help me", "21");
+        put("lights on", "22");
+        put("lights off", "23");
     }};
 
     public static void handleMsg(String msg){
