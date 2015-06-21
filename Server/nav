@@ -1,36 +1,79 @@
 #!/bin/bash
 
-#adb -s localhost:4444 pull /sdcard/motion.log
-#adb -s localhost:4444 shell  "rm /sdcard/motion.log"
-#DEVICE=025f4685dcd48c09
-#DEVICE="192.168.1.3:5555"
-DEVICE="localhost:4444"
-adb -s $DEVICE shell  "rm /sdcard/nav.log 2>/dev/null" 2>/dev/null
+# check if arguments are provided
+if [ $# -ne 1 ] ; then
+	echo "No arguments provided"
+	exit 1
+fi
+
+# set device for adb
+if [ $1 == "-lw" ] || [ $1 == "-ow" ] ; then
+	DEVICE="-s localhost:4444"
+
+elif [ $1 == "-lp" ] || [ $1 == "-op" ] ; then
+	DEVICE=""
+
+else
+	echo "Arguments provided are invalid"
+	exit 1
+fi
+
+# delete the old nav.log on device
+adb $DEVICE shell  "rm /sdcard/nav.log 2>/dev/null" 2>/dev/null
+
+# now run an infinite loop
 while [ 0 ]
 do
-    adb -s $DEVICE pull /sdcard/nav.log 2>/dev/null
+    # read nav.log
+    adb $DEVICE pull /sdcard/nav.log 2>/dev/null
+
     if [ -f "nav.log" ]
     then
-        adb -s $DEVICE shell  "rm /sdcard/nav.log 2>/dev/null" 2>/dev/null
+    	# delete nav.log on device
+        adb $DEVICE shell  "rm /sdcard/nav.log 2>/dev/null" 2>/dev/null
+
+	# read nav.log line by line
         cat nav.log 2>/dev/null| while read line
         do
             echo $line
-            case $line in
-                l)
-		echo 'tell application "System Events" to key code 123'|osascript
-                    ;;
-                r)
-		echo 'tell application "System Events" to key code 124'|osascript
-                    ;;
-                t)
-		echo 'tell application "System Events" to key code 126'|osascript
-                    ;;
-                b)
-		echo 'tell application "System Events" to key code 125'|osascript
-                    ;;
-            esac
+
+	    # handle osx
+	    if [ $1 == "-ow" ] || [ $1 == "-op" ] ; then
+            	case $line in
+                	l)
+				echo 'tell application "System Events" to key code 123'|osascript
+                    	;;
+                	r)
+				echo 'tell application "System Events" to key code 124'|osascript
+                    	;;
+                	t)
+				echo 'tell application "System Events" to key code 126'|osascript
+                    	;;
+                	b)
+				echo 'tell application "System Events" to key code 125'|osascript
+                    	;;
+            	esac
+
+	    # handle for linux
+	    elif [ $1 == "-lw" ] || [ $1 == "-lp" ] ; then
+            	case $line in
+                	l)
+				xdotool key Left
+                    	;;
+                	r)
+				xdotool key Right
+                    	;;
+                	t)
+				xdotool key Up
+                    	;;
+                	b)
+				xdotool key Down
+                    	;;
+            	esac
+	    fi
         done
+
+	# remove the local nav.log
         rm nav.log 2>/dev/null
     fi
  done
-#echo "tell application \"System Events\" to keystroke \"$1\"" | osascript
